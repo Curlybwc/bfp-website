@@ -20,6 +20,25 @@ Jen approves the preview before `bahrfamilyproperties.com` is pointed at it
 - Apply buttons hand off to the tenant screener (bfpapply.lovable.app);
   rent payment stays on Apartments.com. The site builds neither.
 
+## Publishing homes (Piece 5)
+
+Publication itself happens in Ezzie (Jen or Samantha approve a version and
+move the listing to `publish_pending`). The site side is one Maven-run job:
+
+```sh
+npm run publish-listings          # or: python3 tools/publish_listings.py
+```
+
+It confirms each `publish_pending` listing's serving read-back in Ezzie
+(the act that flips it to `published`), rewrites
+`src/_data/listingsManifest.json` with identity only (listing_id, slug,
+address label — never facts), and verifies every entry through the
+anonymous `listing_public_read` the site itself uses. A listing that does
+not serve is reported and left out, never silently dropped; the job exits
+non-zero in that case. Commit the manifest change and push — Pages
+redeploys and the home appears. To unpublish: move the listing in Ezzie,
+re-run the job, commit, push.
+
 ## Build
 
 ```sh

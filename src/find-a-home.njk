@@ -2,17 +2,37 @@
 layout: layouts/base.njk
 title: Find a Home
 permalink: /find-a-home/
+listingPages: true
 ---
 {% import "components/card.njk" as cards %}
 <div class="wrap page">
   <h1>Find a Home</h1>
 
-  <div class="listing-grid">
-    {% for home in sampleHomes %}
-    {{ cards.card(home) }}
-    {% endfor %}
+  <script type="application/json" id="listings-manifest">{{ listingsManifest | dump | safe }}</script>
+
+  {% if listingsManifest.listings.length %}
+  <div class="filter-row" role="group" aria-label="Filter homes by status">
+    <button type="button" class="filter-btn" data-filter="All" aria-pressed="true">All</button>
+    <button type="button" class="filter-btn" data-filter="Available" aria-pressed="false">Available</button>
+    <button type="button" class="filter-btn" data-filter="Coming Soon" aria-pressed="false">Coming Soon</button>
+    <button type="button" class="filter-btn" data-filter="Rented" aria-pressed="false">Rented</button>
   </div>
-  <p class="sample-notice">Sample cards — the real homes appear here when the listings publish.</p>
+  <div class="listing-grid" data-listing-grid></div>
+  <p data-listing-note>Loading our homes…</p>
+  {% else %}
+  <p class="empty-note">No homes are listed right now. New homes appear here as soon as they are ready — please check back soon.</p>
+  {% endif %}
+
+  {% if not listingsManifest.listings.length %}
+  <div data-sample-block>
+    <div class="listing-grid">
+      {% for home in sampleHomes %}
+      {{ cards.card(home) }}
+      {% endfor %}
+    </div>
+    <p class="sample-notice">Sample cards — the real homes appear here when the listings publish.</p>
+  </div>
+  {% endif %}
 
   <p>Already started an application? <a href="https://bfpapply.lovable.app">Pick it back up in the screener</a>.</p>
 </div>

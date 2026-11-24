@@ -2,18 +2,28 @@
 layout: layouts/base.njk
 title: Homes for rent
 permalink: /
+listingPages: true
 ---
 {% import "components/card.njk" as cards %}
 <div class="wrap page">
   <h1>Homes for rent</h1>
   <p class="lede">Section 8 welcome — all our homes accept Housing Choice Vouchers.</p>
 
-  <div class="listing-grid">
-    {% for home in sampleHomes %}
-    {{ cards.card(home) }}
-    {% endfor %}
+  <script type="application/json" id="listings-manifest">{{ listingsManifest | dump | safe }}</script>
+
+  {% if listingsManifest.listings.length %}
+  <div class="listing-grid" data-listing-grid data-limit="6"></div>
+  <p data-listing-note>Loading our homes…</p>
+  {% else %}
+  <div data-sample-block>
+    <div class="listing-grid">
+      {% for home in sampleHomes %}
+      {{ cards.card(home) }}
+      {% endfor %}
+    </div>
+    <p class="sample-notice">Sample cards — the real homes appear here when the listings publish.</p>
   </div>
-  <p class="sample-notice">Sample cards — the real homes appear here when the listings publish.</p>
+  {% endif %}
 
   <p><a class="btn btn-primary" href="{{ '/find-a-home/' | url }}">See all our homes →</a></p>
 

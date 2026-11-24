@@ -1,22 +1,27 @@
 ---
 layout: layouts/base.njk
-title: Sample home
-permalink: /homes/sample-home/
+listingPages: true
+pagination:
+  data: listingsManifest.listings
+  size: 1
+  alias: home
+permalink: "/homes/{{ home.slug }}/"
+eleventyComputed:
+  title: "{{ home.address_label }}"
 ---
-<div class="wrap page">
-  <p class="sample-notice">Sample page — this is the home-detail shell. A real home's photos and facts appear here when its listing publishes.</p>
+{# Real home page. Identity (address label) is manifest data; every fact
+   renders at request time from Ezzie's listing_public_read via
+   listings.js — facts never live in this repo. #}
+<div class="wrap page" data-listing-detail data-listing-id="{{ home.listing_id }}" data-slug="{{ home.slug }}">
+  <h1>{{ home.address_label }}</h1>
+  <p data-detail-status>Loading this home's details…</p>
 
-  <h1>123 Sample Street</h1>
-  <div class="detail-gallery">Photo gallery</div>
+  <div class="detail-gallery" data-detail-gallery>Photo gallery</div>
 
-  <dl class="facts-grid">
-    <div><dt>Rent</dt><dd>$1,200/mo</dd></div>
-    <div><dt>Deposit</dt><dd>$1,200</dd></div>
-    <div><dt>Bedrooms</dt><dd>3</dd></div>
-    <div><dt>Bathrooms</dt><dd>1</dd></div>
-  </dl>
+  <dl class="facts-grid" data-detail-facts></dl>
+  <p data-detail-voucher style="display:none"></p>
 
-  <p><span class="btn btn-primary" aria-disabled="true">Apply</span></p>
+  <div data-detail-apply></div>
   <p>Showings are in person, after an application and screening.</p>
   <p><a href="{{ '/find-a-home/' | url }}">← Back to all homes</a></p>
 </div>
