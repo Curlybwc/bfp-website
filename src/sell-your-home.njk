@@ -3,6 +3,7 @@ layout: layouts/base.njk
 title: Sell Your Home
 permalink: /sell-your-home/
 description: Selling your home? Bahr Family Properties buys houses in any condition — vacant or occupied — for our own portfolio in St. Louis and St. Charles County.
+intakeForms: true
 ---
 <div class="wrap page">
   <h1>Selling your home? We buy houses — in any condition.</h1>
@@ -33,16 +34,38 @@ description: Selling your home? Bahr Family Properties buys houses in any condit
 
   <section class="section" aria-labelledby="intake-h">
     <h2 id="intake-h">Tell us about the home</h2>
-    <p>The intake form asks for:</p>
-    <ul class="plain-list">
-      <li>Your name</li>
-      <li>Your phone</li>
-      <li>Your email</li>
-      <li>The property address</li>
-      <li>Whether the home is occupied or vacant</li>
-      <li>Its condition, and anything else you want us to know</li>
-    </ul>
-    <p>The form isn't taking submissions yet — it opens on this page, and your answers will come straight to us.</p>
+    <p>Your answers come straight to us.</p>
+    <form class="intake-form" data-intake-form="sell_inquiry">
+      <label>Your name
+        <input type="text" name="name" autocomplete="name" required maxlength="120">
+      </label>
+      <label>Your phone
+        <input type="tel" name="phone" autocomplete="tel" maxlength="40">
+      </label>
+      <label>Your email
+        <input type="email" name="email" autocomplete="email" maxlength="200">
+      </label>
+      <label>The property address
+        <input type="text" name="property_address" autocomplete="street-address" required maxlength="240">
+      </label>
+      <label>Is the home occupied or vacant?
+        <select name="occupancy">
+          <option value="">Not sure / rather not say</option>
+          <option value="occupied">Occupied</option>
+          <option value="vacant">Vacant</option>
+        </select>
+      </label>
+      <label>Its condition, and anything else you want us to know
+        <textarea name="message" maxlength="2000"></textarea>
+      </label>
+      <span class="intake-hp" aria-hidden="true">
+        <label>Leave this field empty
+          <input type="text" name="bfp_hp" tabindex="-1" autocomplete="off">
+        </label>
+      </span>
+      <button class="btn" type="submit">Send</button>
+      <p class="intake-status" data-intake-status role="status"></p>
+    </form>
     <p>Prefer email? <a href="mailto:bahrfamilyproperties@gmail.com">bahrfamilyproperties@gmail.com</a></p>
   </section>
 </div>

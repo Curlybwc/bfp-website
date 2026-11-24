@@ -347,3 +347,17 @@ a:hover { color: var(--teal-dark); }
 .footer-nav a { color: var(--ivory); text-decoration: none; font-weight: 700; }
 .footer-nav a:hover { text-decoration: underline; }
 .footer-note { margin: 0.3rem 0; color: #d9e6dd; }
+
+/* — Intake forms (Piece 9) — */
+.intake-form { display: grid; gap: 0.9rem; margin-top: 1rem; text-align: left; }
+.intake-form label { display: grid; gap: 0.3rem; font-weight: 700; color: var(--teal-dark); }
+.intake-form input, .intake-form select, .intake-form textarea {
+  font: inherit; color: var(--ink);
+  background: #fff; border: 1px solid var(--line); border-radius: 8px;
+  padding: 0.55rem 0.7rem; width: 100%;
+}
+.intake-form textarea { min-height: 6rem; resize: vertical; }
+.intake-form .btn { justify-self: start; cursor: pointer; background: var(--teal); color: var(--ivory); }
+.intake-form .btn:disabled { opacity: 0.6; cursor: wait; }
+.intake-status { margin: 0; color: var(--ink-soft); font-weight: 600; }
+.intake-hp { position: absolute; left: -9999px; width: 1px; height: 1px; overflow: hidden; }

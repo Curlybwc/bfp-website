@@ -3,6 +3,7 @@ layout: layouts/base.njk
 title: Current Tenants
 permalink: /current-tenants/
 description: For current Bahr Family Properties tenants — your resident portal on Apartments.com, pay rent, request maintenance, and send a message.
+intakeForms: true
 ---
 <div class="wrap page">
   <h1>Current Tenants</h1>
@@ -22,13 +23,25 @@ description: For current Bahr Family Properties tenants — your resident portal
     </section>
     <section class="door-card" id="request-maintenance" aria-labelledby="maintenance-h">
       <h2 id="maintenance-h">Request maintenance</h2>
-      <p>Tell us what needs fixing at your home. The request form asks for:</p>
-      <ul class="plain-list">
-        <li>Your name</li>
-        <li>Your home's address</li>
-        <li>What's wrong</li>
-      </ul>
-      <p>The form isn't taking requests yet — it opens on this page.</p>
+      <p>Tell us what needs fixing at your home.</p>
+      <form class="intake-form" data-intake-form="maintenance_request">
+        <label>Your name
+          <input type="text" name="name" autocomplete="name" required maxlength="120">
+        </label>
+        <label>Your home's address
+          <input type="text" name="address" autocomplete="street-address" required maxlength="240">
+        </label>
+        <label>What's wrong
+          <textarea name="problem" required maxlength="2000"></textarea>
+        </label>
+        <span class="intake-hp" aria-hidden="true">
+          <label>Leave this field empty
+            <input type="text" name="bfp_hp" tabindex="-1" autocomplete="off">
+          </label>
+        </span>
+        <button class="btn" type="submit">Send maintenance request</button>
+        <p class="intake-status" data-intake-status role="status"></p>
+      </form>
       <p>For an emergency: business phone line: to be set up.</p>
     </section>
     <section class="door-card" id="send-a-message" aria-labelledby="message-h">
