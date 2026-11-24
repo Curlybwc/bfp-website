@@ -1,0 +1,19 @@
+---
+layout: layouts/base.njk
+title: Homes for rent
+permalink: /
+---
+{% import "components/card.njk" as cards %}
+<div class="wrap page">
+  <h1>Homes for rent</h1>
+  <p class="lede">Section 8 welcome — all our homes accept Housing Choice Vouchers.</p>
+
+  <div class="listing-grid">
+    {% for home in sampleHomes %}
+    {{ cards.card(home) }}
+    {% endfor %}
+  </div>
+  <p class="sample-notice">Sample cards — the real homes appear here when the listings publish.</p>
+
+  <p><a class="btn btn-primary" href="{{ '/find-a-home/' | url }}">See all our homes</a></p>
+</div>

@@ -1,0 +1,294 @@
+/* BFP public website — design system.
+   Palette (ruled): dark teal #064B48 on warm ivory #FDF8EB (the logo's own
+   ground, sampled from the picked art so the lockups sit seamlessly).
+   Type (ruled): Fraunces for display, Nunito for body. */
+
+:root {
+  --teal: #064b48;
+  --teal-dark: #04332f;
+  --teal-soft: #e3ebe2;
+  --ivory: #fdf8eb;
+  --ivory-deep: #f4ecd7;
+  --ink: #22302c;
+  --ink-soft: #4c5a55;
+  --line: #ddd2b8;
+  --sand: #b98a2f;
+  --rented: #6d675c;
+  --radius: 14px;
+  --wrap: 72rem;
+}
+
+* { box-sizing: border-box; }
+
+html { scroll-behavior: smooth; }
+@media (prefers-reduced-motion: reduce) {
+  html { scroll-behavior: auto; }
+}
+
+body {
+  margin: 0;
+  background: var(--ivory);
+  color: var(--ink);
+  font-family: "Nunito", system-ui, -apple-system, "Segoe UI", sans-serif;
+  font-size: 1.0625rem;
+  line-height: 1.55;
+}
+
+h1, h2, h3, .card-rent {
+  font-family: "Fraunces", Georgia, "Times New Roman", serif;
+  color: var(--teal-dark);
+  line-height: 1.15;
+}
+
+img { max-width: 100%; height: auto; display: block; }
+
+a { color: var(--teal); }
+a:hover { color: var(--teal-dark); }
+
+:focus-visible {
+  outline: 3px solid var(--sand);
+  outline-offset: 2px;
+  border-radius: 4px;
+}
+
+.wrap {
+  max-width: var(--wrap);
+  margin-inline: auto;
+  padding-inline: 1.25rem;
+}
+
+.skip-link {
+  position: absolute;
+  left: 1rem;
+  top: -4rem;
+  z-index: 20;
+  background: var(--teal);
+  color: var(--ivory);
+  padding: 0.6rem 1rem;
+  border-radius: 0 0 8px 8px;
+  transition: top 0.15s ease;
+}
+.skip-link:focus { top: 0; color: var(--ivory); }
+
+.visually-hidden {
+  position: absolute;
+  width: 1px; height: 1px;
+  overflow: hidden;
+  clip: rect(0 0 0 0);
+  white-space: nowrap;
+}
+
+/* — Tenant doors bar — */
+.doors-bar {
+  background: var(--teal);
+  color: var(--ivory);
+  font-size: 0.95rem;
+}
+.doors-bar-inner {
+  display: flex;
+  align-items: center;
+  gap: 1rem;
+  flex-wrap: wrap;
+  padding-block: 0.35rem;
+}
+.doors-label { font-weight: 800; letter-spacing: 0.01em; }
+.doors-list {
+  display: flex;
+  gap: 1.25rem;
+  flex-wrap: wrap;
+  list-style: none;
+  margin: 0; padding: 0;
+}
+.doors-list a { color: var(--ivory); text-decoration: none; font-weight: 600; }
+.doors-list a:hover { text-decoration: underline; }
+
+/* — Header — */
+.site-header {
+  background: var(--ivory);
+  border-bottom: 1px solid var(--line);
+}
+.header-inner {
+  display: flex;
+  align-items: center;
+  gap: 1.5rem;
+  flex-wrap: wrap;
+  padding-block: 0.6rem;
+}
+.brand img { height: 52px; width: auto; }
+.main-nav { margin-inline-start: auto; }
+.main-nav ul {
+  display: flex;
+  gap: 1.4rem;
+  flex-wrap: wrap;
+  list-style: none;
+  margin: 0; padding: 0;
+}
+.main-nav a {
+  color: var(--ink);
+  text-decoration: none;
+  font-weight: 700;
+}
+.main-nav a:hover { color: var(--teal); }
+.main-nav a[aria-current="page"] {
+  color: var(--teal);
+  border-bottom: 3px solid var(--teal);
+}
+
+/* — Buttons — */
+.btn {
+  display: inline-block;
+  padding: 0.65rem 1.3rem;
+  border-radius: 999px;
+  font-weight: 800;
+  text-decoration: none;
+  border: 2px solid var(--teal);
+}
+.btn-primary { background: var(--teal); color: var(--ivory); }
+.btn-primary:hover { background: var(--teal-dark); color: var(--ivory); }
+.btn-ghost { background: transparent; color: var(--teal); }
+.btn-ghost:hover { background: var(--teal-soft); color: var(--teal-dark); }
+.header-contact { padding: 0.5rem 1.1rem; }
+
+/* — Page shell — */
+.page { padding-block: 2.5rem 3.5rem; }
+.page h1 { font-size: clamp(2rem, 4.5vw, 3rem); margin: 0 0 0.75rem; }
+.lede { font-size: 1.2rem; color: var(--ink-soft); max-width: 42rem; }
+
+/* — Listing grid + compact card — */
+.listing-grid {
+  display: grid;
+  grid-template-columns: 1fr;
+  gap: 1.5rem;
+  margin-block: 1.75rem;
+}
+@media (min-width: 40rem) {
+  .listing-grid { grid-template-columns: repeat(2, 1fr); }
+}
+@media (min-width: 64rem) {
+  .listing-grid { grid-template-columns: repeat(3, 1fr); }
+}
+
+.listing-card {
+  background: #fffdf6;
+  border: 1px solid var(--line);
+  border-radius: var(--radius);
+  overflow: hidden;
+  display: flex;
+  flex-direction: column;
+}
+.card-photo {
+  position: relative;
+  aspect-ratio: 16 / 9;
+  background: linear-gradient(150deg, var(--teal-soft), var(--ivory-deep));
+}
+.card-photo img { width: 100%; height: 100%; object-fit: cover; }
+.photo-placeholder {
+  position: absolute; inset: 0;
+  display: grid; place-items: center;
+  color: var(--ink-soft);
+  font-weight: 700;
+  letter-spacing: 0.08em;
+  text-transform: uppercase;
+  font-size: 0.85rem;
+}
+.banner {
+  position: absolute;
+  top: 0.7rem; left: 0.7rem;
+  padding: 0.28rem 0.7rem;
+  border-radius: 999px;
+  font-size: 0.85rem;
+  font-weight: 800;
+  color: var(--ivory);
+  background: var(--teal);
+}
+.banner-coming-soon { background: var(--sand); color: #2e2103; }
+.banner-rented { background: var(--rented); }
+.sample-tag {
+  position: absolute;
+  top: 0.7rem; right: 0.7rem;
+  padding: 0.28rem 0.7rem;
+  border-radius: 999px;
+  font-size: 0.85rem;
+  font-weight: 800;
+  background: var(--ivory);
+  color: var(--teal-dark);
+  border: 2px dashed var(--teal);
+}
+.card-body { padding: 1rem 1.1rem 1.2rem; }
+.card-rent { font-size: 1.45rem; font-weight: 700; margin: 0; }
+.card-address { font-size: 1.12rem; margin: 0.3rem 0 0.2rem; }
+.card-address a { color: inherit; text-decoration: none; }
+.card-address a:hover { text-decoration: underline; }
+.card-facts, .card-deposit { margin: 0.15rem 0; color: var(--ink-soft); }
+
+/* — Home detail shell — */
+.detail-gallery {
+  aspect-ratio: 16 / 9;
+  border: 1px solid var(--line);
+  border-radius: var(--radius);
+  background: linear-gradient(150deg, var(--teal-soft), var(--ivory-deep));
+  display: grid; place-items: center;
+  color: var(--ink-soft); font-weight: 700;
+  letter-spacing: 0.08em; text-transform: uppercase; font-size: 0.9rem;
+  margin-block: 1.5rem;
+}
+.facts-grid {
+  display: grid;
+  grid-template-columns: repeat(auto-fit, minmax(10rem, 1fr));
+  gap: 1rem;
+  margin-block: 1.5rem;
+}
+.facts-grid dt { font-weight: 800; color: var(--teal-dark); }
+.facts-grid dd { margin: 0.2rem 0 0; }
+.sample-notice {
+  border: 2px dashed var(--teal);
+  border-radius: var(--radius);
+  padding: 0.8rem 1.1rem;
+  font-weight: 700;
+  background: #fffdf6;
+}
+
+/* — Doors row (Current Tenants shell) — */
+.doors-row {
+  display: grid;
+  grid-template-columns: 1fr;
+  gap: 1.25rem;
+  margin-block: 1.75rem;
+}
+@media (min-width: 48rem) {
+  .doors-row { grid-template-columns: repeat(3, 1fr); }
+}
+.door-card {
+  border: 1px solid var(--line);
+  border-radius: var(--radius);
+  background: #fffdf6;
+  padding: 1.25rem;
+}
+.door-card h2 { margin-top: 0; font-size: 1.35rem; }
+
+/* — Footer — */
+.site-footer {
+  background: var(--teal);
+  color: var(--ivory);
+  margin-top: 2rem;
+}
+.footer-inner { padding-block: 2.25rem; text-align: center; }
+.footer-logo {
+  display: inline-block;
+  background: var(--ivory);
+  border-radius: var(--radius);
+  padding: 0.9rem 1.4rem;
+  margin: 0 0 1.25rem;
+}
+.footer-logo img { width: 220px; }
+.footer-nav ul {
+  display: flex;
+  justify-content: center;
+  gap: 1.4rem;
+  flex-wrap: wrap;
+  list-style: none;
+  margin: 0 0 1rem; padding: 0;
+}
+.footer-nav a { color: var(--ivory); text-decoration: none; font-weight: 700; }
+.footer-nav a:hover { text-decoration: underline; }
+.footer-note { margin: 0.3rem 0; color: #d9e6dd; }

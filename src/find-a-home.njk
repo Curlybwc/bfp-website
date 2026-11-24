@@ -1,0 +1,18 @@
+---
+layout: layouts/base.njk
+title: Find a Home
+permalink: /find-a-home/
+---
+{% import "components/card.njk" as cards %}
+<div class="wrap page">
+  <h1>Find a Home</h1>
+
+  <div class="listing-grid">
+    {% for home in sampleHomes %}
+    {{ cards.card(home) }}
+    {% endfor %}
+  </div>
+  <p class="sample-notice">Sample cards — the real homes appear here when the listings publish.</p>
+
+  <p>Already started an application? <a href="https://bfpapply.lovable.app">Pick it back up in the screener</a>.</p>
+</div>

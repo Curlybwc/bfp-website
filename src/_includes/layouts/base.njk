@@ -1,0 +1,67 @@
+<!doctype html>
+<html lang="en">
+<head>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <title>{% if title %}{{ title }} · {% endif %}Bahr Family Properties</title>
+  <meta name="description" content="{{ description or 'Homes for rent in St. Louis and St. Charles County from Bahr Family Properties.' }}">
+  <link rel="icon" type="image/png" href="{{ '/assets/img/favicon.png' | url }}">
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+  <link href="https://fonts.googleapis.com/css2?family=Fraunces:opsz,wght@9..144,500;9..144,600;9..144,700&family=Nunito:wght@400;600;700;800&display=swap" rel="stylesheet">
+  <link rel="stylesheet" href="{{ '/assets/css/main.css' | url }}">
+</head>
+<body>
+  <a class="skip-link" href="#main">Skip to main content</a>
+
+  <div class="doors-bar">
+    <div class="wrap doors-bar-inner">
+      <span class="doors-label">Current tenants</span>
+      <nav aria-label="Tenant doors">
+        <ul class="doors-list">
+          {% for door in site.tenantDoors %}
+          <li><a href="{{ door.href | url }}">{{ door.label }}</a></li>
+          {% endfor %}
+        </ul>
+      </nav>
+    </div>
+  </div>
+
+  <header class="site-header">
+    <div class="wrap header-inner">
+      <a class="brand" href="{{ '/' | url }}" aria-label="Bahr Family Properties — home">
+        <img src="{{ '/assets/img/logo-horizontal.png' | url }}" alt="Bahr Family Properties" width="3863" height="560">
+      </a>
+      <nav class="main-nav" aria-label="Main">
+        <ul>
+          {% for item in site.nav %}
+          <li><a href="{{ item.href | url }}"{% if page.url == item.href %} aria-current="page"{% endif %}>{{ item.label }}</a></li>
+          {% endfor %}
+        </ul>
+      </nav>
+      <a class="btn btn-primary header-contact" href="{{ '/our-family/#contact' | url }}">Contact us</a>
+    </div>
+  </header>
+
+  <main id="main">
+    {{ content | safe }}
+  </main>
+
+  <footer class="site-footer">
+    <div class="wrap footer-inner">
+      <p class="footer-logo">
+        <img src="{{ '/assets/img/logo-full.png' | url }}" alt="Bahr Family Properties" width="1326" height="856" loading="lazy">
+      </p>
+      <nav class="footer-nav" aria-label="Footer">
+        <ul>
+          {% for item in site.nav %}
+          <li><a href="{{ item.href | url }}">{{ item.label }}</a></li>
+          {% endfor %}
+        </ul>
+      </nav>
+      <p class="footer-note">Business phone line: to be set up</p>
+      <p class="footer-note">© {{ '' | dateYear }} Bahr Family Properties LLC</p>
+    </div>
+  </footer>
+</body>
+</html>

@@ -1,0 +1,1 @@
+{"description":"Bahr Family Properties public website — static site, data from Ezzie's public listing reads.","devDependencies":{"@11ty/eleventy":"^3.0.0"},"name":"bfp-website","private":true,"scripts":{"build":"eleventy","serve":"eleventy --serve"},"type":"module","version":"0.1.0"}

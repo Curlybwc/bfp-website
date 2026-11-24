@@ -1,0 +1,26 @@
+{#
+  Compact listing card (Space-governed shape): short 16:9 photo with the
+  status banner on the photo, then rent, address, beds/baths, deposit.
+  Phase 1 scaffold renders this from sample data only; Piece 6 binds it to
+  Ezzie's listing_public_read results. A home whose status is not known
+  never renders as Available — callers pass the approved status only.
+#}
+{% macro card(home) %}
+<article class="listing-card">
+  <div class="card-photo">
+    {% if home.photo %}
+    <img src="{{ home.photo | url }}" alt="Photo of {{ home.address }}" loading="lazy">
+    {% else %}
+    <span class="photo-placeholder" role="img" aria-label="No photo yet">Photo</span>
+    {% endif %}
+    <span class="banner banner-{{ home.status | slugify }}">{{ home.status }}</span>
+    {% if home.sample %}<span class="sample-tag">Sample</span>{% endif %}
+  </div>
+  <div class="card-body">
+    <p class="card-rent">{{ home.rent }}</p>
+    <h3 class="card-address"><a href="{{ home.url | url }}">{{ home.address }}</a></h3>
+    <p class="card-facts">{{ home.beds }} · {{ home.baths }}</p>
+    <p class="card-deposit">{{ home.deposit }}</p>
+  </div>
+</article>
+{% endmacro %}
