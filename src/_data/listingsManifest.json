@@ -1,6 +1,11 @@
 {
-  "generated_at": "2026-11-25T01:50:15.679711+00:00",
+  "generated_at": "2026-11-25T02:28:06.011007+00:00",
   "listings": [
+    {
+      "listing_id": "98d61f8f-3276-4d0d-8770-c8577d775f8c",
+      "slug": "25-la-venta",
+      "address_label": "25 La Venta Drive, Florissant, MO"
+    },
     {
       "listing_id": "ebdd0328-ee97-43ff-ba24-4607a36d66ff",
       "slug": "6748-crest-2e",
