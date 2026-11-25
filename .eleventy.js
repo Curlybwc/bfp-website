@@ -5,6 +5,9 @@
 // design, and page structure only.
 export default function (eleventyConfig) {
   eleventyConfig.addPassthroughCopy({ "src/assets": "assets" });
+  // Custom domain (Piece 12): the CNAME file must land in the built site's
+  // root so the Pages artifact carries the domain on every deploy.
+  eleventyConfig.addPassthroughCopy({ CNAME: "CNAME" });
   eleventyConfig.addFilter("dateYear", () => new Date().getFullYear());
 
   return {
@@ -14,9 +17,9 @@ export default function (eleventyConfig) {
       includes: "_includes",
       data: "_data",
     },
-    // GitHub Pages project address (curlybwc.github.io/bfp-website/).
-    // When the custom domain is pointed (Piece 12), this becomes "/".
-    pathPrefix: "/bfp-website/",
+    // Custom domain pointed 2026-11-25 (Piece 12): the site serves at the
+    // root of bahrfamilyproperties.com, so no path prefix.
+    pathPrefix: "/",
     templateFormats: ["njk", "md", "html"],
     htmlTemplateEngine: "njk",
     markdownTemplateEngine: "njk",
