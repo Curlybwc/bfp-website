@@ -1,4 +1,15 @@
 {
-  "generated_at": "2026-11-24T19:20:33.694026+00:00",
-  "listings": []
+  "generated_at": "2026-11-25T01:50:15.679711+00:00",
+  "listings": [
+    {
+      "listing_id": "ebdd0328-ee97-43ff-ba24-4607a36d66ff",
+      "slug": "6748-crest-2e",
+      "address_label": "6748 Crest 2E, University City, MO"
+    },
+    {
+      "listing_id": "bb158fea-d8b8-4fb6-81ca-89856ae3c354",
+      "slug": "6748-crest-2w",
+      "address_label": "6748 Crest 2W, University City, MO"
+    }
+  ]
 }

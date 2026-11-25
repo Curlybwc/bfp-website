@@ -91,8 +91,8 @@
     addr.appendChild(link);
     body.appendChild(addr);
     var bits = [];
-    var beds = fact(d.facts, "bedrooms");
-    var baths = fact(d.facts, "bathrooms");
+    var beds = fact(d.facts, "beds");
+    var baths = fact(d.facts, "baths");
     if (beds !== null) bits.push(beds + " bd");
     if (baths !== null) bits.push(baths + " ba");
     if (bits.length) body.appendChild(el("p", "card-facts", bits.join(" · ")));
@@ -120,6 +120,8 @@
     if (limit > 0) entries = entries.slice(0, limit);
     var note = document.querySelector("[data-listing-note]");
     if (!entries.length) return;
+    var pastGrid = document.querySelector("[data-listing-grid-past]");
+    var pastSection = document.querySelector("[data-past-section]");
     Promise.all(
       entries.map(function (entry) {
         return rpc("listing_public_read", entry.listing_id)
@@ -132,19 +134,30 @@
       })
     ).then(function (results) {
       var rendered = 0;
+      var pastRendered = 0;
       results.forEach(function (r) {
         if (r.d && r.d.outcome === "ok") {
-          grid.appendChild(buildCard(r.entry, r.d));
-          rendered++;
+          var card = buildCard(r.entry, r.d);
+          // Occupied homes are past rentals: they group under the Past
+          // Rentals heading when the page has one, never in the main grid.
+          if (pastGrid && r.d.availability === "occupied") {
+            pastGrid.appendChild(card);
+            pastRendered++;
+          } else {
+            grid.appendChild(card);
+            rendered++;
+          }
         }
       });
+      if (pastSection && pastRendered) pastSection.hidden = false;
       if (note) {
-        note.textContent = rendered
-          ? ""
-          : "These homes are not showing right now — please check back shortly.";
+        note.textContent =
+          rendered || pastRendered
+            ? ""
+            : "These homes are not showing right now — please check back shortly.";
       }
       var samples = document.querySelector("[data-sample-block]");
-      if (samples && rendered) samples.style.display = "none";
+      if (samples && (rendered || pastRendered)) samples.style.display = "none";
     });
   }
 
@@ -158,13 +171,20 @@
           b.setAttribute("aria-pressed", b === btn ? "true" : "false");
         });
         document
-          .querySelectorAll("[data-listing-grid] .listing-card")
+          .querySelectorAll(
+            "[data-listing-grid] .listing-card, [data-listing-grid-past] .listing-card"
+          )
           .forEach(function (card) {
             card.style.display =
               want === "All" || card.getAttribute("data-banner") === want
                 ? ""
                 : "none";
           });
+        var pastSection = document.querySelector("[data-past-section]");
+        if (pastSection && !pastSection.hidden) {
+          pastSection.style.display =
+            want === "All" || want === "Rented" ? "" : "none";
+        }
       });
     });
   }
@@ -172,11 +192,11 @@
   var FACT_ROWS = [
     ["rent_monthly", "Rent", function (v) { return money(v) + "/mo"; }],
     ["deposit", "Deposit", function (v) { return money(v); }],
-    ["bedrooms", "Bedrooms", String],
-    ["bathrooms", "Bathrooms", String],
-    ["sq_ft", "Square feet", function (v) { return Number(v).toLocaleString("en-US"); }],
+    ["beds", "Bedrooms", String],
+    ["baths", "Bathrooms", String],
+    ["square_feet", "Square feet", function (v) { return Number(v).toLocaleString("en-US"); }],
     ["available_date", "Available", String],
-    ["utilities", "Utilities", String],
+    ["utility_responsibility", "Utilities", String],
     ["school_district", "School district", String],
   ];
 
@@ -191,6 +211,10 @@
           return;
         }
         status.textContent = "";
+        if (d.availability === "occupied") {
+          var pastBanner = container.querySelector("[data-detail-past]");
+          if (pastBanner) pastBanner.hidden = false;
+        }
         // Gallery — approved renditions only (the read filters them).
         var gallery = container.querySelector("[data-detail-gallery]");
         var media = d.media || [];
