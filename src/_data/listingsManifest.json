@@ -1,5 +1,5 @@
 {
-  "generated_at": "2026-11-25T08:17:09.746525+00:00",
+  "generated_at": "2026-11-25T22:40:44.318960+00:00",
   "listings": [
     {
       "listing_id": "33077047-ff20-44b4-8d90-f76594346cbc",
@@ -15,6 +15,16 @@
       "listing_id": "98d61f8f-3276-4d0d-8770-c8577d775f8c",
       "slug": "25-la-venta",
       "address_label": "25 La Venta Drive, Florissant, MO"
+    },
+    {
+      "listing_id": "5c0da6f7-7058-4e7d-ad65-e6594d430a31",
+      "slug": "4150-taft",
+      "address_label": "4150 Taft, St. Louis, MO"
+    },
+    {
+      "listing_id": "d73b9519-14fb-47df-b8a9-b75555ea0592",
+      "slug": "4441-nebraska",
+      "address_label": "4441 Nebraska, St. Louis, MO"
     },
     {
       "listing_id": "ebdd0328-ee97-43ff-ba24-4607a36d66ff",
