@@ -20,6 +20,11 @@
 
 * { box-sizing: border-box; }
 
+/* The hidden attribute always wins — a class display rule must never
+   resurrect a hidden element (this is what showed the Past Rental
+   banner on every detail page regardless of the home's state). */
+[hidden] { display: none !important; }
+
 html { scroll-behavior: smooth; }
 @media (prefers-reduced-motion: reduce) {
   html { scroll-behavior: auto; }
@@ -214,6 +219,15 @@ a:hover { color: var(--teal-dark); }
   color: var(--ivory);
   background: var(--rented);
 }
+.coming-soon-banner {
+  display: inline-block;
+  padding: 0.28rem 0.7rem;
+  border-radius: 999px;
+  font-size: 0.85rem;
+  font-weight: 800;
+  color: #2e2103;
+  background: var(--sand);
+}
 .sample-tag {
   position: absolute;
   top: 0.7rem; right: 0.7rem;
@@ -317,6 +331,18 @@ a:hover { color: var(--teal-dark); }
   margin-block: 2.5rem;
 }
 .family-band h2 { color: var(--ivory); margin: 0 0 0.5rem; font-size: 1.7rem; }
+.family-photo { border-radius: var(--radius); }
+.family-band .family-photo { width: 100%; margin: 0 0 1.25rem; }
+.family-intro { margin-block: 0 1rem; }
+.family-intro .family-photo { width: 100%; }
+@media (min-width: 48rem) {
+  .family-intro {
+    display: grid;
+    grid-template-columns: minmax(0, 22rem) 1fr;
+    gap: 1.75rem;
+    align-items: start;
+  }
+}
 .btn-band { background: var(--ivory); color: var(--teal-dark); border-color: var(--ivory); }
 .btn-band:hover { background: var(--ivory-deep); color: var(--teal-dark); }
 

@@ -126,7 +126,6 @@
   function wireGrid(grid) {
     var entries = readManifest();
     var limit = parseInt(grid.getAttribute("data-limit") || "0", 10);
-    if (limit > 0) entries = entries.slice(0, limit);
     var note = document.querySelector("[data-listing-note]");
     if (!entries.length) return;
     var pastGrid = document.querySelector("[data-listing-grid-past]");
@@ -142,20 +141,34 @@
           });
       })
     ).then(function (results) {
-      var rendered = 0;
-      var pastRendered = 0;
+      // Default order (Jen, 2026-11-25): Available first, then Coming
+      // Soon, then Past Rentals — ranked by each home's live read
+      // state, never by manifest order. Sort is stable, so homes of
+      // the same standing keep their manifest order.
+      var rank = { Available: 0, "Coming Soon": 1, Rented: 2 };
+      var cards = [];
       results.forEach(function (r) {
         if (r.d && r.d.outcome === "ok") {
-          var card = buildCard(r.entry, r.d);
-          // Occupied homes are past rentals: they group under the Past
-          // Rentals heading when the page has one, never in the main grid.
-          if (pastGrid && r.d.availability === "occupied") {
-            pastGrid.appendChild(card);
-            pastRendered++;
-          } else {
-            grid.appendChild(card);
-            rendered++;
-          }
+          cards.push({ d: r.d, card: buildCard(r.entry, r.d) });
+        }
+      });
+      cards.sort(function (a, b) {
+        return (
+          rank[a.card.getAttribute("data-banner")] -
+          rank[b.card.getAttribute("data-banner")]
+        );
+      });
+      var rendered = 0;
+      var pastRendered = 0;
+      cards.forEach(function (c) {
+        // Occupied homes are past rentals: they group under the Past
+        // Rentals heading when the page has one, never in the main grid.
+        if (pastGrid && c.d.availability === "occupied") {
+          pastGrid.appendChild(c.card);
+          pastRendered++;
+        } else if (limit <= 0 || rendered < limit) {
+          grid.appendChild(c.card);
+          rendered++;
         }
       });
       if (pastSection && pastRendered) pastSection.hidden = false;
@@ -322,9 +335,15 @@
           return;
         }
         status.textContent = "";
+        // The badge matches the read state exactly: occupied shows
+        // Past Rental, unavailable_review shows Coming Soon, and an
+        // available home shows no badge.
         if (d.availability === "occupied") {
           var pastBanner = container.querySelector("[data-detail-past]");
           if (pastBanner) pastBanner.hidden = false;
+        } else if (d.availability === "unavailable_review") {
+          var soonBanner = container.querySelector("[data-detail-soon]");
+          if (soonBanner) soonBanner.hidden = false;
         }
         // Gallery — approved renditions only (the read filters them),
         // shown as a carousel with the whole photo visible.
@@ -335,6 +354,11 @@
         if (media.length) {
           var h1 = container.querySelector("h1");
           buildCarousel(gallery, media, h1 ? h1.textContent : "this home");
+        } else {
+          // No approved photos yet — say so plainly instead of leaving
+          // a large empty box.
+          gallery.textContent = "No photos yet";
+          gallery.classList.add("no-photos");
         }
         // Facts grid — unknown facts are omitted, never invented.
         var grid = container.querySelector("[data-detail-facts]");

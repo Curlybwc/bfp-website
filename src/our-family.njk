@@ -2,11 +2,15 @@
 layout: layouts/base.njk
 title: Our Family
 permalink: /our-family/
+intakeForms: true
 ---
 <div class="wrap page">
   <h1>Our Family</h1>
 
-  <p class="lede">Bahr Family Properties is a local family company. We own the homes we rent — homes in St. Louis and St. Charles County — and every one of them accepts Housing Choice Vouchers.</p>
+  <div class="family-intro">
+    <img class="family-photo" src="{{ '/assets/img/family-porch-portrait.jpg' | url }}" alt="The Bahr family" width="1000" height="1500" loading="lazy">
+    <p class="lede">Bahr Family Properties is a local family company. We own the homes we rent — homes in the greater St. Louis Metro area — and every one of them accepts Housing Choice Vouchers.</p>
+  </div>
 
   <section class="section" aria-labelledby="doors-h">
     <h2 id="doors-h">Where to go next</h2>
@@ -19,7 +23,31 @@ permalink: /our-family/
 
   <section id="contact" aria-labelledby="contact-h">
     <h2 id="contact-h">Contact us</h2>
-    <p>Email: <a href="mailto:bahrfamilyproperties@gmail.com">bahrfamilyproperties@gmail.com</a></p>
-    <p>Business phone line: to be set up</p>
+    <p>Send us a message — it comes straight to us.</p>
+    <form class="intake-form" data-intake-form="contact_message">
+      <label>Your name
+        <input type="text" name="name" autocomplete="name" required maxlength="120">
+      </label>
+      <label>Your email
+        <input type="email" name="email" autocomplete="email" required maxlength="200">
+      </label>
+      <label>Your phone (optional)
+        <input type="tel" name="phone" autocomplete="tel" maxlength="40">
+      </label>
+      <label>What home is this about? (optional)
+        <input type="text" name="home" maxlength="240">
+      </label>
+      <label>Your message
+        <textarea name="message" required maxlength="2000"></textarea>
+      </label>
+      <span class="intake-hp" aria-hidden="true">
+        <label>Leave this field empty
+          <input type="text" name="bfp_hp" tabindex="-1" autocomplete="off">
+        </label>
+      </span>
+      <button class="btn" type="submit">Send</button>
+      <p class="intake-status" data-intake-status role="status"></p>
+    </form>
+    <p>Prefer email? <a href="mailto:bahrfamilyproperties@gmail.com">bahrfamilyproperties@gmail.com</a></p>
   </section>
 </div>

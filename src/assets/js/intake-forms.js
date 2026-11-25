@@ -1,6 +1,7 @@
 // BFP public website — intake form submitter (Piece 9).
-// Posts the maintenance and sell-your-home forms to Ezzie's public
-// intake endpoint, which files each submission into Ezzie Capture.
+// Posts the site's forms (maintenance, sell-your-home, contact) to
+// Ezzie's public intake endpoint, which files each submission into
+// Ezzie Capture.
 // The endpoint is public by design (allowlisted fields, rate-limited);
 // no credential of any kind lives here.
 (function () {
