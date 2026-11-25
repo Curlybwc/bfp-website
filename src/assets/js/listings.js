@@ -65,19 +65,28 @@
     card.setAttribute("data-banner", banner);
 
     var photo = el("div", "card-photo");
+    // The photo itself is a door to the home's detail page (Jen,
+    // 2026-11-25), same destination as the address link below.
+    var photoLink = el("a", "card-photo-link");
+    photoLink.href = sitePath("homes/" + entry.slug + "/");
+    photoLink.setAttribute(
+      "aria-label",
+      "See details for " + entry.address_label
+    );
     var media = d.media || [];
     if (media.length && media[0].rendition_ref) {
       var img = document.createElement("img");
       img.src = sitePath("assets/media/" + media[0].rendition_ref);
       img.alt = "Photo of " + entry.address_label;
       img.loading = "lazy";
-      photo.appendChild(img);
+      photoLink.appendChild(img);
     } else {
       var ph = el("span", "photo-placeholder", "Photo");
       ph.setAttribute("role", "img");
       ph.setAttribute("aria-label", "No photo yet");
-      photo.appendChild(ph);
+      photoLink.appendChild(ph);
     }
+    photo.appendChild(photoLink);
     var b = el("span", "banner banner-" + banner.toLowerCase().replace(/ /g, "-"), banner);
     photo.appendChild(b);
     card.appendChild(photo);
@@ -200,6 +209,108 @@
     ["school_district", "School district", String],
   ];
 
+  // Photo carousel for the detail page (Jen, 2026-11-25): one photo at
+  // a time, the WHOLE photo visible — renditions are contained, never
+  // cropped — with prev/next buttons, touch swipe, and arrow keys.
+  function buildCarousel(gallery, media, label) {
+    gallery.textContent = "";
+    gallery.classList.add("has-carousel");
+
+    var carousel = el("div", "carousel");
+    carousel.setAttribute("role", "region");
+    carousel.setAttribute("aria-roledescription", "carousel");
+    carousel.setAttribute("aria-label", "Photos of " + label);
+
+    var viewport = el("div", "carousel-viewport");
+    var track = el("div", "carousel-track");
+    var slides = media.map(function (m, i) {
+      var slide = el("div", "carousel-slide");
+      slide.setAttribute("role", "group");
+      slide.setAttribute("aria-roledescription", "slide");
+      slide.setAttribute("aria-label", i + 1 + " of " + media.length);
+      var img = document.createElement("img");
+      img.src = sitePath("assets/media/" + m.rendition_ref);
+      img.alt = "Photo of " + label;
+      if (i > 0) img.loading = "lazy";
+      slide.appendChild(img);
+      track.appendChild(slide);
+      return slide;
+    });
+    viewport.appendChild(track);
+    carousel.appendChild(viewport);
+    gallery.appendChild(carousel);
+
+    if (media.length < 2) return;
+
+    var live = el("span", "visually-hidden");
+    live.setAttribute("aria-live", "polite");
+    carousel.appendChild(live);
+    var counter = el("span", "carousel-counter", "1 / " + media.length);
+    counter.setAttribute("aria-hidden", "true");
+    carousel.appendChild(counter);
+
+    var idx = 0;
+    function go(n) {
+      idx = ((n % media.length) + media.length) % media.length;
+      track.style.transform = "translateX(" + -idx * 100 + "%)";
+      counter.textContent = idx + 1 + " / " + media.length;
+      live.textContent = "Photo " + (idx + 1) + " of " + media.length;
+      slides.forEach(function (s, i) {
+        if (i === idx) s.removeAttribute("aria-hidden");
+        else s.setAttribute("aria-hidden", "true");
+      });
+    }
+
+    function navButton(cls, ariaLabel, path, delta) {
+      var btn = el("button", "carousel-btn " + cls);
+      btn.type = "button";
+      btn.setAttribute("aria-label", ariaLabel);
+      btn.innerHTML =
+        '<svg viewBox="0 0 24 24" aria-hidden="true" focusable="false">' +
+        '<path d="' + path + '" fill="none" stroke="currentColor" ' +
+        'stroke-width="2.5" stroke-linecap="round" ' +
+        'stroke-linejoin="round"/></svg>';
+      btn.addEventListener("click", function () {
+        go(idx + delta);
+      });
+      return btn;
+    }
+    carousel.appendChild(
+      navButton("carousel-prev", "Previous photo", "M15 5l-7 7 7 7", -1)
+    );
+    carousel.appendChild(
+      navButton("carousel-next", "Next photo", "M9 5l7 7-7 7", 1)
+    );
+
+    carousel.addEventListener("keydown", function (e) {
+      if (e.key === "ArrowLeft") go(idx - 1);
+      else if (e.key === "ArrowRight") go(idx + 1);
+      else return;
+      e.preventDefault();
+    });
+
+    var startX = null;
+    viewport.addEventListener(
+      "touchstart",
+      function (e) {
+        startX = e.changedTouches[0].clientX;
+      },
+      { passive: true }
+    );
+    viewport.addEventListener(
+      "touchend",
+      function (e) {
+        if (startX === null) return;
+        var dx = e.changedTouches[0].clientX - startX;
+        if (Math.abs(dx) > 40) go(idx + (dx < 0 ? 1 : -1));
+        startX = null;
+      },
+      { passive: true }
+    );
+
+    go(0);
+  }
+
   function wireDetail(container) {
     var listingId = container.getAttribute("data-listing-id");
     var slug = container.getAttribute("data-slug");
@@ -215,19 +326,15 @@
           var pastBanner = container.querySelector("[data-detail-past]");
           if (pastBanner) pastBanner.hidden = false;
         }
-        // Gallery — approved renditions only (the read filters them).
+        // Gallery — approved renditions only (the read filters them),
+        // shown as a carousel with the whole photo visible.
         var gallery = container.querySelector("[data-detail-gallery]");
-        var media = d.media || [];
+        var media = (d.media || []).filter(function (m) {
+          return m.rendition_ref;
+        });
         if (media.length) {
-          gallery.textContent = "";
-          media.forEach(function (m) {
-            if (!m.rendition_ref) return;
-            var img = document.createElement("img");
-            img.src = sitePath("assets/media/" + m.rendition_ref);
-            img.alt = "Photo of this home";
-            img.loading = "lazy";
-            gallery.appendChild(img);
-          });
+          var h1 = container.querySelector("h1");
+          buildCarousel(gallery, media, h1 ? h1.textContent : "this home");
         }
         // Facts grid — unknown facts are omitted, never invented.
         var grid = container.querySelector("[data-detail-facts]");
@@ -258,14 +365,16 @@
         }
         if (!d.application_open) return;
         rpc("listing_apply_entry_read", listingId).then(function (entry) {
-          if (entry && entry.outcome === "ok" &&
+          // The read's success outcome is "entry" (verified live
+          // 2026-11-25); it binds this listing + property exactly.
+          if (entry && entry.outcome === "entry" &&
               entry.screener_route_key === "bfp_tenant_screener") {
-            var a = el("a", "btn btn-primary", "Apply");
+            var a = el("a", "btn btn-primary", "Pre-screen Now (Free)");
             a.href = SCREENER + slug;
             a.target = "_blank";
             a.rel = "noopener";
             applyZone.appendChild(a);
-          } else if (entry && entry.outcome === "ok") {
+          } else if (entry && entry.outcome === "entry") {
             var c = el("a", "btn btn-primary", "Contact us to apply");
             c.href = sitePath("our-family/#contact");
             applyZone.appendChild(c);

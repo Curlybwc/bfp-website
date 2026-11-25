@@ -8,11 +8,13 @@
 {% macro card(home) %}
 <article class="listing-card">
   <div class="card-photo">
+    <a class="card-photo-link" href="{{ home.url | url }}" aria-label="See details for {{ home.address }}">
     {% if home.photo %}
     <img src="{{ home.photo | url }}" alt="Photo of {{ home.address }}" loading="lazy">
     {% else %}
     <span class="photo-placeholder" role="img" aria-label="No photo yet">Photo</span>
     {% endif %}
+    </a>
     <span class="banner banner-{{ home.status | slugify }}">{{ home.status }}</span>
     {% if home.sample %}<span class="sample-tag">Sample</span>{% endif %}
   </div>
