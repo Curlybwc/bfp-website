@@ -3,6 +3,7 @@ layout: layouts/base.njk
 title: How to Apply & Requirements
 permalink: /how-to-apply/
 description: How to apply for a Bahr Family Properties home — the leasing procedure and screening criteria, in full.
+disclosure: true
 ---
 <div class="wrap page">
   <h1>How to Apply &amp; Requirements</h1>
@@ -13,7 +14,8 @@ description: How to apply for a Bahr Family Properties home — the leasing proc
      requirements"). The document's footer phone line is the one omission:
      no phone number is printed on this site. #}
   <section class="section" aria-labelledby="req-h">
-    <h2 id="req-h">Requirements</h2>
+    <h2 id="req-h"><button type="button" class="req-toggle" data-disclosure-btn aria-expanded="false" aria-controls="req-body">Rental requirements</button></h2>
+    <div id="req-body" data-disclosure-panel hidden>
     <p><strong>Bahr Family Properties Leasing Procedure for Rental Homes</strong></p>
 
     <h3>To Apply to Rent this Home:</h3>
@@ -37,7 +39,7 @@ description: How to apply for a Bahr Family Properties home — the leasing proc
       </li>
       <li>Positive references from previous landlords, including no past due amounts owed, no damages and no significant lease violations.</li>
       <li>No prior evictions (within 5 years).</li>
-      <li>No bad criminal history.</li>
+      <li>Background check on every application; criminal history is reviewed individually.</li>
       <li>No smoking inside the home, of any substance including marijuana.</li>
       <li>No outstanding collections to utility companies.</li>
       <li>Mostly positive pay history on credit report for last 1 to 2 years. We have no minimum credit score; however, scores under 550 require a double deposit of two months rent.</li>
@@ -65,8 +67,8 @@ description: How to apply for a Bahr Family Properties home — the leasing proc
       </li>
       <li>Occupancy Permit from local municipality (if applicable)</li>
       <li>Proof that utilities have been transferred into your name</li>
-      <li>Proof of renter’s insurance.</li>
     </ul>
+    </div>
   </section>
 
   <section class="section" aria-labelledby="s8-h">
