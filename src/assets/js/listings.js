@@ -65,35 +65,45 @@
     card.setAttribute("data-banner", banner);
 
     var photo = el("div", "card-photo");
-    // The photo itself is a door to the home's detail page (Jen,
-    // 2026-11-25), same destination as the address link below.
-    var photoLink = el("a", "card-photo-link");
-    photoLink.href = sitePath("homes/" + entry.slug + "/");
-    photoLink.setAttribute(
-      "aria-label",
-      "See details for " + entry.address_label
-    );
     var media = d.media || [];
+    var photoControl;
     if (media.length && media[0].rendition_ref) {
+      // Tapping the card photo opens this home's photos full-screen
+      // (Jen, 2026-11-26); the address link below leads to the
+      // home's page. The control is a button named for the photo
+      // viewer it opens — never a "details" link that does not
+      // navigate.
+      photoControl = el("button", "card-photo-link");
+      photoControl.type = "button";
+      photoControl.setAttribute(
+        "aria-label",
+        "View photos of " + entry.address_label + " full screen"
+      );
       var img = document.createElement("img");
       img.src = sitePath("assets/media/" + media[0].rendition_ref);
-      img.alt = "Photo of " + entry.address_label;
+      // The button's label names the photo; the image itself is
+      // decorative inside it.
+      img.alt = "";
       img.loading = "lazy";
-      photoLink.appendChild(img);
-      // Tapping the card photo opens this home's photos full-screen
-      // (Jen, 2026-11-26) instead of following the link; the address
-      // link below still leads to the home's page.
-      photoLink.addEventListener("click", function (e) {
-        e.preventDefault();
-        openLightbox(photoList(media, entry.address_label), 0, photoLink);
+      photoControl.appendChild(img);
+      photoControl.addEventListener("click", function () {
+        openLightbox(photoList(media, entry.address_label), 0, photoControl);
       });
     } else {
+      // No photo yet — the frame still leads to the home's page,
+      // so here the link and its "details" name are the true ones.
+      photoControl = el("a", "card-photo-link");
+      photoControl.href = sitePath("homes/" + entry.slug + "/");
+      photoControl.setAttribute(
+        "aria-label",
+        "See details for " + entry.address_label
+      );
       var ph = el("span", "photo-placeholder", "Photo");
       ph.setAttribute("role", "img");
       ph.setAttribute("aria-label", "No photo yet");
-      photoLink.appendChild(ph);
+      photoControl.appendChild(ph);
     }
-    photo.appendChild(photoLink);
+    photo.appendChild(photoControl);
     var b = el("span", "banner banner-" + banner.toLowerCase().replace(/ /g, "-"), banner);
     photo.appendChild(b);
     card.appendChild(photo);
@@ -271,6 +281,18 @@
     lbRender();
   }
 
+  // The lightbox's keyboard-reachable controls, in DOM order.
+  // Prev/next are display:none when the home has a single photo,
+  // so they drop out of the list exactly when they leave the screen.
+  function lbControls() {
+    var btns = lbState.root.querySelectorAll("button");
+    var out = [];
+    for (var i = 0; i < btns.length; i++) {
+      if (btns[i].style.display !== "none") out.push(btns[i]);
+    }
+    return out;
+  }
+
   function openLightbox(list, idx, opener) {
     if (!list.length) return;
     buildLightbox();
@@ -363,6 +385,27 @@
       if (e.key === "Escape") closeLightbox();
       else if (e.key === "ArrowLeft") lbStep(-1);
       else if (e.key === "ArrowRight") lbStep(1);
+      else if (e.key === "Tab") {
+        // The dialog is modal: keep Tab cycling among its own
+        // visible controls instead of wrapping to the page behind
+        // the overlay, and pull focus back in if it ever sits
+        // outside the dialog. Focus returns to the opener on
+        // close (see closeLightbox).
+        var controls = lbControls();
+        if (!controls.length) return;
+        var first = controls[0];
+        var last = controls[controls.length - 1];
+        var outside = controls.indexOf(document.activeElement) === -1;
+        if (e.shiftKey) {
+          if (outside || document.activeElement === first) {
+            e.preventDefault();
+            last.focus({ preventScroll: true });
+          }
+        } else if (outside || document.activeElement === last) {
+          e.preventDefault();
+          first.focus({ preventScroll: true });
+        }
+      }
     });
 
     document.body.appendChild(root);
@@ -383,6 +426,7 @@
 
     var viewport = el("div", "carousel-viewport");
     var track = el("div", "carousel-track");
+    var imgs = [];
     var slides = media.map(function (m, i) {
       var slide = el("div", "carousel-slide");
       slide.setAttribute("role", "group");
@@ -411,6 +455,7 @@
       });
       slide.appendChild(img);
       track.appendChild(slide);
+      imgs.push(img);
       return slide;
     });
     viewport.appendChild(track);
@@ -435,6 +480,11 @@
       slides.forEach(function (s, i) {
         if (i === idx) s.removeAttribute("aria-hidden");
         else s.setAttribute("aria-hidden", "true");
+        // Only the showing slide's photo stays in the tab order.
+        // A hidden slide sits inside an aria-hidden region, so its
+        // photo must not stay keyboard-reachable — a keyboard user
+        // tabbing to it would open a photo that is not on screen.
+        imgs[i].setAttribute("tabindex", i === idx ? "0" : "-1");
       });
     }
 
