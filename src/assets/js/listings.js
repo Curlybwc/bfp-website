@@ -65,28 +65,45 @@
     card.setAttribute("data-banner", banner);
 
     var photo = el("div", "card-photo");
-    // The photo itself is a door to the home's detail page (Jen,
-    // 2026-11-25), same destination as the address link below.
-    var photoLink = el("a", "card-photo-link");
-    photoLink.href = sitePath("homes/" + entry.slug + "/");
-    photoLink.setAttribute(
-      "aria-label",
-      "See details for " + entry.address_label
-    );
     var media = d.media || [];
+    var photoControl;
     if (media.length && media[0].rendition_ref) {
+      // Tapping the card photo opens this home's photos full-screen
+      // (Jen, 2026-11-26); the address link below leads to the
+      // home's page. The control is a button named for the photo
+      // viewer it opens — never a "details" link that does not
+      // navigate.
+      photoControl = el("button", "card-photo-link");
+      photoControl.type = "button";
+      photoControl.setAttribute(
+        "aria-label",
+        "View photos of " + entry.address_label + " full screen"
+      );
       var img = document.createElement("img");
       img.src = sitePath("assets/media/" + media[0].rendition_ref);
-      img.alt = "Photo of " + entry.address_label;
+      // The button's label names the photo; the image itself is
+      // decorative inside it.
+      img.alt = "";
       img.loading = "lazy";
-      photoLink.appendChild(img);
+      photoControl.appendChild(img);
+      photoControl.addEventListener("click", function () {
+        openLightbox(photoList(media, entry.address_label), 0, photoControl);
+      });
     } else {
+      // No photo yet — the frame still leads to the home's page,
+      // so here the link and its "details" name are the true ones.
+      photoControl = el("a", "card-photo-link");
+      photoControl.href = sitePath("homes/" + entry.slug + "/");
+      photoControl.setAttribute(
+        "aria-label",
+        "See details for " + entry.address_label
+      );
       var ph = el("span", "photo-placeholder", "Photo");
       ph.setAttribute("role", "img");
       ph.setAttribute("aria-label", "No photo yet");
-      photoLink.appendChild(ph);
+      photoControl.appendChild(ph);
     }
-    photo.appendChild(photoLink);
+    photo.appendChild(photoControl);
     var b = el("span", "banner banner-" + banner.toLowerCase().replace(/ /g, "-"), banner);
     photo.appendChild(b);
     card.appendChild(photo);
@@ -222,6 +239,179 @@
     ["school_district", "School district", String],
   ];
 
+  // Full-screen photo view (Jen, 2026-11-26): tapping any listing
+  // photo — card or carousel — opens the WHOLE photo full-screen on a
+  // dark ground, uncropped (contained, letterboxed), with a close
+  // button, a tap on the dark ground, or Esc to close, and prev/next
+  // stepping through that home's photos.
+  var lbState = { list: [], idx: 0, opener: null, root: null };
+
+  function photoList(media, label) {
+    return (media || [])
+      .filter(function (m) {
+        return m.rendition_ref;
+      })
+      .map(function (m) {
+        return {
+          src: sitePath("assets/media/" + m.rendition_ref),
+          alt: "Photo of " + label,
+        };
+      });
+  }
+
+  function lbRender() {
+    var root = lbState.root;
+    var item = lbState.list[lbState.idx];
+    if (!root || !item) return;
+    var img = root.querySelector(".lightbox-img");
+    img.src = item.src;
+    img.alt = item.alt;
+    root.querySelector(".lightbox-counter").textContent =
+      lbState.idx + 1 + " / " + lbState.list.length;
+    var multi = lbState.list.length > 1;
+    root.querySelector(".lightbox-prev").style.display = multi ? "" : "none";
+    root.querySelector(".lightbox-next").style.display = multi ? "" : "none";
+    root.querySelector(".lightbox-counter").style.display = multi ? "" : "none";
+  }
+
+  function lbStep(d) {
+    var n = lbState.list.length;
+    if (n < 2) return;
+    lbState.idx = (((lbState.idx + d) % n) + n) % n;
+    lbRender();
+  }
+
+  // The lightbox's keyboard-reachable controls, in DOM order.
+  // Prev/next are display:none when the home has a single photo,
+  // so they drop out of the list exactly when they leave the screen.
+  function lbControls() {
+    var btns = lbState.root.querySelectorAll("button");
+    var out = [];
+    for (var i = 0; i < btns.length; i++) {
+      if (btns[i].style.display !== "none") out.push(btns[i]);
+    }
+    return out;
+  }
+
+  function openLightbox(list, idx, opener) {
+    if (!list.length) return;
+    buildLightbox();
+    lbState.list = list;
+    lbState.idx = idx || 0;
+    lbState.opener = opener || null;
+    lbRender();
+    lbState.root.hidden = false;
+    document.body.style.overflow = "hidden";
+    var closeBtn = lbState.root.querySelector(".lightbox-close");
+    if (closeBtn.focus) closeBtn.focus({ preventScroll: true });
+  }
+
+  function closeLightbox() {
+    if (!lbState.root || lbState.root.hidden) return;
+    lbState.root.hidden = true;
+    document.body.style.overflow = "";
+    if (lbState.opener && lbState.opener.focus) {
+      lbState.opener.focus({ preventScroll: true });
+    }
+    lbState.opener = null;
+  }
+
+  function buildLightbox() {
+    if (lbState.root) return;
+    var root = el("div", "lightbox");
+    root.hidden = true;
+    root.setAttribute("role", "dialog");
+    root.setAttribute("aria-modal", "true");
+    root.setAttribute("aria-label", "Photo viewer");
+
+    var img = el("img", "lightbox-img");
+    root.appendChild(img);
+
+    function navBtn(cls, ariaLabel, path, d) {
+      var btn = el("button", "lightbox-btn " + cls);
+      btn.type = "button";
+      btn.setAttribute("aria-label", ariaLabel);
+      btn.innerHTML =
+        '<svg viewBox="0 0 24 24" aria-hidden="true" focusable="false">' +
+        '<path d="' + path + '" fill="none" stroke="currentColor" ' +
+        'stroke-width="2.5" stroke-linecap="round" ' +
+        'stroke-linejoin="round"/></svg>';
+      btn.addEventListener("click", function () {
+        lbStep(d);
+      });
+      return btn;
+    }
+    root.appendChild(navBtn("lightbox-prev", "Previous photo", "M15 5l-7 7 7 7", -1));
+    root.appendChild(navBtn("lightbox-next", "Next photo", "M9 5l7 7-7 7", 1));
+
+    var closeBtn = el("button", "lightbox-btn lightbox-close");
+    closeBtn.type = "button";
+    closeBtn.setAttribute("aria-label", "Close photo viewer");
+    closeBtn.innerHTML =
+      '<svg viewBox="0 0 24 24" aria-hidden="true" focusable="false">' +
+      '<path d="M6 6l12 12M18 6L6 18" fill="none" stroke="currentColor" ' +
+      'stroke-width="2.5" stroke-linecap="round"/></svg>';
+    closeBtn.addEventListener("click", closeLightbox);
+    root.appendChild(closeBtn);
+
+    var counter = el("span", "lightbox-counter", "");
+    counter.setAttribute("aria-hidden", "true");
+    root.appendChild(counter);
+
+    // A tap on the dark ground (not on the photo or a button) closes.
+    root.addEventListener("click", function (e) {
+      if (e.target === root) closeLightbox();
+    });
+    var startX = null;
+    root.addEventListener(
+      "touchstart",
+      function (e) {
+        startX = e.changedTouches[0].clientX;
+      },
+      { passive: true }
+    );
+    root.addEventListener(
+      "touchend",
+      function (e) {
+        if (startX === null) return;
+        var dx = e.changedTouches[0].clientX - startX;
+        if (Math.abs(dx) > 40) lbStep(dx < 0 ? 1 : -1);
+        startX = null;
+      },
+      { passive: true }
+    );
+    document.addEventListener("keydown", function (e) {
+      if (!lbState.root || lbState.root.hidden) return;
+      if (e.key === "Escape") closeLightbox();
+      else if (e.key === "ArrowLeft") lbStep(-1);
+      else if (e.key === "ArrowRight") lbStep(1);
+      else if (e.key === "Tab") {
+        // The dialog is modal: keep Tab cycling among its own
+        // visible controls instead of wrapping to the page behind
+        // the overlay, and pull focus back in if it ever sits
+        // outside the dialog. Focus returns to the opener on
+        // close (see closeLightbox).
+        var controls = lbControls();
+        if (!controls.length) return;
+        var first = controls[0];
+        var last = controls[controls.length - 1];
+        var outside = controls.indexOf(document.activeElement) === -1;
+        if (e.shiftKey) {
+          if (outside || document.activeElement === first) {
+            e.preventDefault();
+            last.focus({ preventScroll: true });
+          }
+        } else if (outside || document.activeElement === last) {
+          e.preventDefault();
+          first.focus({ preventScroll: true });
+        }
+      }
+    });
+
+    document.body.appendChild(root);
+    lbState.root = root;
+  }
+
   // Photo carousel for the detail page (Jen, 2026-11-25): one photo at
   // a time, the WHOLE photo visible — renditions are contained, never
   // cropped — with prev/next buttons, touch swipe, and arrow keys.
@@ -236,6 +426,7 @@
 
     var viewport = el("div", "carousel-viewport");
     var track = el("div", "carousel-track");
+    var imgs = [];
     var slides = media.map(function (m, i) {
       var slide = el("div", "carousel-slide");
       slide.setAttribute("role", "group");
@@ -245,8 +436,26 @@
       img.src = sitePath("assets/media/" + m.rendition_ref);
       img.alt = "Photo of " + label;
       if (i > 0) img.loading = "lazy";
+      // Tapping the photo opens it full-screen, whole and uncropped.
+      img.classList.add("zoomable");
+      img.setAttribute("tabindex", "0");
+      img.setAttribute("role", "button");
+      img.setAttribute(
+        "aria-label",
+        "See photo " + (i + 1) + " of " + media.length + " full screen"
+      );
+      img.addEventListener("click", function () {
+        openLightbox(photoList(media, label), i, img);
+      });
+      img.addEventListener("keydown", function (e) {
+        if (e.key === "Enter" || e.key === " ") {
+          e.preventDefault();
+          openLightbox(photoList(media, label), i, img);
+        }
+      });
       slide.appendChild(img);
       track.appendChild(slide);
+      imgs.push(img);
       return slide;
     });
     viewport.appendChild(track);
@@ -271,6 +480,11 @@
       slides.forEach(function (s, i) {
         if (i === idx) s.removeAttribute("aria-hidden");
         else s.setAttribute("aria-hidden", "true");
+        // Only the showing slide's photo stays in the tab order.
+        // A hidden slide sits inside an aria-hidden region, so its
+        // photo must not stay keyboard-reachable — a keyboard user
+        // tabbing to it would open a photo that is not on screen.
+        imgs[i].setAttribute("tabindex", i === idx ? "0" : "-1");
       });
     }
 
@@ -377,6 +591,76 @@
               "This home accepts Housing Choice Vouchers.";
             vch.style.display = "";
           }
+        }
+        // Costs to move in (Jen, 2026-11-26) — computed from THIS
+        // home's own rent and deposit facts, never hand-typed. The
+        // deposit fact is the deposit; absent one, one month's rent.
+        var moveinZone = container.querySelector("[data-detail-movein]");
+        var rentAmt = fact(d.facts, "rent_monthly");
+        if (moveinZone && rentAmt !== null) {
+          var depAmt = fact(d.facts, "deposit");
+          if (depAmt === null) depAmt = rentAmt;
+          var halfDep = Math.round((depAmt / 2) * 100) / 100;
+          var mi = el("section", "movein-block");
+          mi.setAttribute("aria-label", "Costs to move in");
+          mi.appendChild(el("h2", null, "Costs to move in"));
+          var figs = el("dl", "facts-grid movein-figures");
+          [
+            ["To hold this home", money(halfDep)],
+            ["Due at move-in", money(rentAmt + halfDep)],
+            ["Total to move in", money(rentAmt + depAmt)],
+          ].forEach(function (row) {
+            var cell = el("div");
+            cell.appendChild(el("dt", null, row[0]));
+            cell.appendChild(el("dd", null, row[1]));
+            figs.appendChild(cell);
+          });
+          mi.appendChild(figs);
+          mi.appendChild(
+            el(
+              "p",
+              null,
+              "To hold this home takes half the deposit; the other half " +
+                "is due at move-in with the first month's rent, plus " +
+                "landlord-billed utilities (such as sewer & trash) where " +
+                "they apply for this home."
+            )
+          );
+          mi.appendChild(
+            el(
+              "p",
+              null,
+              "With a Housing Choice Voucher, the deposit is a flat " +
+                "$1,000 — $500 to hold this home, and $500 at move-in " +
+                "plus your portion of the first month's rent."
+            )
+          );
+          mi.appendChild(
+            el(
+              "p",
+              null,
+              "Without a voucher, a credit score under 550 requires a " +
+                "double deposit of two months' rent (" +
+                money(rentAmt * 2) +
+                ") — " +
+                money(rentAmt) +
+                " to hold this home, and " +
+                money(rentAmt * 2) +
+                " at move-in (the first month's rent plus one month's " +
+                "rent toward the deposit)."
+            )
+          );
+          mi.appendChild(
+            el(
+              "p",
+              null,
+              "The amount paid to hold the home is refundable if the " +
+                "move-in falls through on the landlord or Housing " +
+                "Authority side; it is non-refundable if you cancel for " +
+                "another reason."
+            )
+          );
+          moveinZone.appendChild(mi);
         }
         // Apply — only when Ezzie says applications are open for this home.
         var applyZone = container.querySelector("[data-detail-apply]");

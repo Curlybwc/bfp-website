@@ -60,9 +60,11 @@
           {% endfor %}
         </ul>
       </nav>
+      <p class="footer-broker">Jennifer Bahr is a licensed real estate broker in Missouri — Integrity Realty STL.</p>
       <p class="footer-note">© {{ '' | dateYear }} Bahr Family Properties LLC</p>
     </div>
   </footer>
+  {% if disclosure %}<noscript><style>[data-disclosure-panel]{display:block !important}</style></noscript><script src="{{ '/assets/js/site-ui.js' | url }}" defer></script>{% endif %}
   {% if intakeForms %}<script src="{{ '/assets/js/intake-forms.js' | url }}" defer></script>{% endif %}
   {% if listingPages %}<script src="{{ '/assets/js/listings.js' | url }}" defer></script>{% endif %}
 </body>

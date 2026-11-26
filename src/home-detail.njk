@@ -1,6 +1,7 @@
 ---
 layout: layouts/base.njk
 listingPages: true
+disclosure: true
 pagination:
   data: listingsManifest.listings
   size: 1
@@ -14,6 +15,11 @@ eleventyComputed:
    listings.js — facts never live in this repo. #}
 <div class="wrap page" data-listing-detail data-listing-id="{{ home.listing_id }}" data-slug="{{ home.slug }}">
   <h1>{{ home.address_label }}</h1>
+  {# Broker disclosure (Missouri Real Estate Commission advertising
+     rule 20 CSR 2250-8.070): Jen holds an interest in every home here
+     and they are not listed by a brokerage entity — the rule's own
+     phrase stands prominently with the listing facts. #}
+  <p class="owner-broker-line">By owner-broker</p>
   <p data-detail-status>Loading this home's details…</p>
   <p class="past-rental-banner" data-detail-past hidden>Past Rental — this home is rented and not available.</p>
   <p class="coming-soon-banner" data-detail-soon hidden>Coming Soon — this home is not available yet.</p>
@@ -23,6 +29,8 @@ eleventyComputed:
   <dl class="facts-grid" data-detail-facts></dl>
   <p data-detail-voucher style="display:none"></p>
 
+  <div data-detail-movein></div>
+
   <div data-detail-apply></div>
   <p>Showings are in person after a successful pre-screening (free).</p>
 
@@ -30,13 +38,14 @@ eleventyComputed:
      for Tenants, as carried on How to Apply), printed at the bottom of
      every home's page per Jen's direction 2026-11-25. #}
   <section class="section" aria-labelledby="req-h">
-    <h2 id="req-h">Rental requirements</h2>
+    <h2 id="req-h"><button type="button" class="req-toggle" data-disclosure-btn aria-expanded="false" aria-controls="req-body">Rental requirements</button></h2>
+    <div id="req-body" data-disclosure-panel hidden>
     <ul class="plain-list">
       <li>A state ID is required for the pre-screen</li>
       <li>Income at least 3× the monthly rent — or 1.5× the monthly rent with a Housing Choice Voucher</li>
       <li>Positive references from previous landlords — no past-due amounts owed, no damages, no significant lease violations</li>
       <li>No prior evictions (within 5 years)</li>
-      <li>No bad criminal history</li>
+      <li>Background check on every application; criminal history is reviewed individually</li>
       <li>No outstanding collections to utility companies</li>
       <li>Mostly positive pay history on the credit report for the last 1 to 2 years. We have no minimum credit score; however, scores under 550 require a double deposit of two months rent.</li>
       <li>No smoking inside the home, of any substance including marijuana</li>
@@ -52,12 +61,12 @@ eleventyComputed:
     <p>Animals are allowed on a case by case basis, with a $250 animal deposit and $25/month animal rent.</p>
     <h3>Move-in</h3>
     <ul class="plain-list">
-      <li>Proof of renter's insurance</li>
       <li>Utilities in your name</li>
       <li>An occupancy permit, where your city requires one</li>
       <li>If you do not have a housing voucher and your credit score is below 550, the double deposit described above applies</li>
     </ul>
     <p>The full requirements are on the <a href="{{ '/how-to-apply/' | url }}">How to Apply</a> page.</p>
+    </div>
   </section>
 
   <p><a href="{{ '/find-a-home/' | url }}">← Back to all homes</a></p>
