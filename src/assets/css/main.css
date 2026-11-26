@@ -45,6 +45,11 @@ h1, h2, h3, .card-rent {
   line-height: 1.15;
 }
 
+/* Display-size headings read better a hair tighter (apple-design
+   typography: tracking is size-specific). Display sizes only —
+   h3 and body text keep their natural spacing. */
+h1, h2 { letter-spacing: -0.01em; }
+
 img { max-width: 100%; height: auto; display: block; }
 
 a { color: var(--teal); }
@@ -152,6 +157,11 @@ a:hover { color: var(--teal-dark); }
 .btn-primary:hover { background: var(--teal-dark); color: var(--ivory); }
 .btn-ghost { background: transparent; color: var(--teal); }
 .btn-ghost:hover { background: var(--teal-soft); color: var(--teal-dark); }
+/* Press feedback — a button answers on pointer-down, not after the
+   click lands (apple-design §1). */
+.btn:active { transform: scale(0.97); }
+.btn-primary:active { background: var(--teal-dark); color: var(--ivory); }
+.btn-ghost:active { background: var(--teal-soft); color: var(--teal-dark); }
 .header-contact { padding: 0.5rem 1.1rem; }
 
 /* — Page shell — */
@@ -186,8 +196,14 @@ a:hover { color: var(--teal-dark); }
   aspect-ratio: 16 / 9;
   background: linear-gradient(150deg, var(--teal-soft), var(--ivory-deep));
 }
-.card-photo img { width: 100%; height: 100%; object-fit: cover; }
-.card-photo-link { display: block; width: 100%; height: 100%; }
+/* The WHOLE photo shows — contained on the frame's matte, never
+   cropped (Jen, 2026-11-26: photos were getting cut off). Same
+   treatment as the detail carousel: letterboxing is fine,
+   cropping is the defect. The link fills the frame absolutely so
+   the 16:9 frame holds its shape for any photo — the photo is
+   contained inside it, never stretched to fill and never clipped. */
+.card-photo img { width: 100%; height: 100%; object-fit: contain; }
+.card-photo-link { position: absolute; inset: 0; display: block; }
 .photo-placeholder {
   position: absolute; inset: 0;
   display: grid; place-items: center;
@@ -323,28 +339,45 @@ a:hover { color: var(--teal-dark); }
   line-height: 1;
 }
 
+/* Family sections (Jen, 2026-11-26): the photo sits modestly on
+   the left with the words beside it on the right — never a
+   full-width photo stacked over the text. The side-by-side
+   arrangement holds at phone width too: the photo takes about
+   two-fifths of the row, the words the rest. */
 .family-band {
   background: var(--teal);
   color: var(--ivory);
   border-radius: var(--radius);
   padding: 1.75rem;
   margin-block: 2.5rem;
+  display: grid;
+  grid-template-columns: minmax(0, 5fr) minmax(0, 7fr);
+  gap: 1rem 1.25rem;
+  align-items: center;
 }
 .family-band h2 { color: var(--ivory); margin: 0 0 0.5rem; font-size: 1.7rem; }
 .family-photo { border-radius: var(--radius); }
-.family-band .family-photo { width: 100%; margin: 0 0 1.25rem; }
-.family-intro { margin-block: 0 1rem; }
+.family-band .family-photo { width: 100%; margin: 0; }
+@media (min-width: 48rem) {
+  .family-band { grid-template-columns: minmax(0, 24rem) 1fr; gap: 1.75rem; }
+}
+.family-intro {
+  margin-block: 0 1rem;
+  display: grid;
+  grid-template-columns: minmax(0, 2fr) minmax(0, 3fr);
+  gap: 1.25rem;
+  align-items: start;
+}
 .family-intro .family-photo { width: 100%; }
 @media (min-width: 48rem) {
   .family-intro {
-    display: grid;
-    grid-template-columns: minmax(0, 22rem) 1fr;
+    grid-template-columns: minmax(0, 18rem) 1fr;
     gap: 1.75rem;
-    align-items: start;
   }
 }
 .btn-band { background: var(--ivory); color: var(--teal-dark); border-color: var(--ivory); }
 .btn-band:hover { background: var(--ivory-deep); color: var(--teal-dark); }
+.btn-band:active { background: var(--ivory-deep); color: var(--teal-dark); }
 
 .trust-row {
   display: flex;
@@ -407,6 +440,8 @@ a:hover { color: var(--teal-dark); }
   font-weight: 700; font-family: inherit; font-size: 0.95rem;
 }
 .filter-btn[aria-pressed="true"] { background: var(--teal); color: var(--ivory); }
+.filter-btn:active { background: var(--teal-soft); transform: scale(0.96); }
+.filter-btn[aria-pressed="true"]:active { background: var(--teal-dark); }
 .empty-note {
   border: 1px solid var(--line); border-radius: var(--radius);
   padding: 1rem 1.1rem; background: #fffdf6; margin-block: 1.75rem;
@@ -456,6 +491,9 @@ a:hover { color: var(--teal-dark); }
   cursor: pointer;
 }
 .carousel-btn:hover { background: var(--teal-dark); }
+/* The press state keeps the centering translate — dropping it
+   would make the button jump on tap. */
+.carousel-btn:active { background: var(--teal-dark); transform: translateY(-50%) scale(0.92); }
 .carousel-btn svg { width: 1.35rem; height: 1.35rem; }
 .carousel-prev { left: 0.75rem; }
 .carousel-next { right: 0.75rem; }
